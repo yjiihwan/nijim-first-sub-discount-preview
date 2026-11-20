@@ -267,8 +267,8 @@
         <div class="dg"><div><div class="lb">${fsMode ? "첫 달 할인금액 · 할인율(필수)" : "할인금액 · 할인율(필수)"}</div>
           <div class="ir"><input class="inp" data-val="1" inputmode="numeric" placeholder="할인금액,할인율" value="${esc(F.value)}"><span class="ut"><button class="${F.unit === "won" ? "on" : ""}" data-unit="won">원</button><button class="${F.unit === "pct" ? "on" : ""}" data-unit="pct">%</button></span></div>
           ${err ? `<p class="err">${esc(err)}</p>` : fsMode ? `<p class="ap">첫 달 결제 금액 : <b>${won(after)}</b>원 <span class="nx">· 다음 달부터 매월 ${won(lp)}원(정상가)</span></p>` : `<p class="ap">할인된 가격 : <b>${won(after)}</b>원</p>`}</div>
-        <div><div class="lb">제한인원</div><div class="ir"><input class="inp lim ${F.unlimited ? "dis" : ""}" data-lim="1" ${F.unlimited ? "disabled" : ""} value="${esc(F.limit)}"><span class="mt">명 까지 구매가능</span></div>
-          <label class="cb sm ${F.unlimited ? "on" : ""}"><input type="checkbox" data-unl="1" ${F.unlimited ? "checked" : ""}><i></i>이용가능 인원 제한없다면 체크</label></div></div></div>`;
+        <div><div class="lb">선착순</div><div class="ir"><input class="inp lim ${F.unlimited ? "dis" : ""}" data-lim="1" ${F.unlimited ? "disabled" : ""} value="${esc(F.limit)}"><span class="mt">명 까지 구매가능</span></div>
+          <label class="cb sm ${F.unlimited ? "on" : ""}"><input type="checkbox" data-unl="1" ${F.unlimited ? "checked" : ""}><i></i>구매가능 인원 제한없다면 체크</label></div></div></div>`;
     }).join("") : "";
     return `<div class="adw"><div class="adp fm">
       <div class="fh"><h1>할인이벤트&체험권 등록 - ${esc(c.name)}</h1><span class="q">?</span></div>
