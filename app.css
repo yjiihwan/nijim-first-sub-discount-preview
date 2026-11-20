@@ -28,18 +28,20 @@
 .shop .subh{display:flex;align-items:center;gap:6px}
 .subchip{background:#16A267;color:#fff;font-size:12px;font-weight:700;border-radius:999px;padding:3px 9px}
 .subrow{display:flex;align-items:flex-start;gap:14px;padding:22px 16px 6px 22px}
-.subrow .card{width:131px}
+.subrow .cw{flex:none;width:131px}
 .subrow .checks{flex:1;display:flex;flex-direction:column;gap:8px;min-width:0}
 .subrow .checks div{height:25px;border-radius:999px;background:#F1F2F4;display:flex;align-items:center;gap:5px;padding:0 8px;font-size:11.5px;font-weight:600;white-space:nowrap;overflow:hidden}
 .subrow .checks svg{flex:none;width:14px;height:14px}
 /* 첫 구독 할인가 카드: 기존 이벤트 카드와 같은 틀, 본문 3줄 */
 .card.fs .c3{gap:0}
+.card.ts.fs .c3 .p{font-size:9px;font-weight:700;line-height:1.25}
 .card.fs .c3 .big{font-size:12px}
 .card.fs .c3 .nx{font-size:9px;color:#777;margin-top:1px}
 .card .ebadge.fsb{font-size:7.2px;letter-spacing:-0.4px}
-.fs-teaser{display:flex;align-items:center;justify-content:space-between;gap:6px;width:calc(100% - 32px);margin:10px 16px 0;border:1px solid #F6C6D5;background:#FFF2F6;border-radius:8px;padding:9px 12px;font-size:13px;color:#222;text-align:left}
-.fs-teaser .t1 b{color:#D11}
-.fs-teaser .t2{flex:none;color:#E8336D;font-weight:700;font-size:12.5px}
+.fs-not{display:flex;align-items:center;flex-wrap:wrap;gap:2px 5px;margin:12px 16px 0 22px;font-size:12.5px;color:#444;font-weight:600}
+.fs-not b{color:#8A8F99;font-weight:700}
+.fs-not span{color:#888;font-weight:500;font-size:12px}
+.fs-not span::before{content:"· "}
 
 /* ── 회원: 결제진행 추가분 ── */
 .fs-plan{margin:14px 0 4px;background:#FFF2F6;border:1px solid #F8CFDC;border-radius:10px;padding:12px 14px}
@@ -155,3 +157,13 @@
 .dbox .dg{margin-left:0}
 .cal{width:15px;height:15px;flex:none;margin-right:6px}
 .dbox .dg{margin-top:14px}
+
+/* ── 실서비스 타임세일 카드(이벤트 종료일 있는 할인, 구독·일반 공통 — 형 참고 화면) ── */
+.cw{flex:none;width:131px;display:flex;flex-direction:column;align-items:center}
+.card.ts .c1{background:#F4E500;color:#111}
+.card.ts .c2{background:#FFFAC0}
+.card.ts .c3 .p{color:#D11}
+.card.ts .c3 .big{color:#D11}
+.tsbadge{position:absolute;left:-13px;top:-11px;width:33px;height:33px;border-radius:50%;background:conic-gradient(from 200deg,#FFF1A8 0 28%,#FFB11B 28% 62%,#FF8A1E 62% 100%);display:flex;align-items:center;justify-content:center;box-shadow:0 1px 2px rgba(0,0,0,.18);z-index:1}
+.tsbadge i{width:27px;height:27px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#FF4A3D,#E3161E 70%);color:#fff;font-style:normal;font-weight:700;font-size:7.4px;line-height:1.05;letter-spacing:-0.2px;display:flex;align-items:center;justify-content:center;text-align:center}
+.cw .left{margin-top:3px;font-size:10px;color:#8A1538;white-space:nowrap;letter-spacing:-0.1px}

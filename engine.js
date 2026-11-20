@@ -37,12 +37,14 @@
     return { state: "eligible", reason: trial ? "무료 체험권만 이용(대상 포함 설정)" : "이 센터 이력 없음" };
   }
 
-  function activeAt(ev, now) { return ev.status !== "ended" && ev.start <= now && now <= ev.end && (ev.limit == null || ev.sold < ev.limit); }
+  function activeAt(ev, now) { return ev.status !== "ended" && ev.start <= now && (ev.end == null || now <= ev.end) && (ev.limit == null || ev.sold < ev.limit); }
 
   /* 한 구독 상품 옵션의 회원별 가격.
      - 일반 할인(target=all)과 신규 첫 구독(target=first_sub)은 더하지 않는다. 1회차 결제금액이 더 싼 쪽 하나. 같으면 일반 할인(1회 한정 자격을 아껴 둠).
      - 2회차부터: 신규 첫 구독이 없었다면 냈을 금액 = 일반 할인이 갱신에도 유지되는 구조면 그 값, 아니면 정가.
-     - 비로그인(history=null): 가격은 일반 할인/정가로만 보여 주고, 신규 할인은 «안내(teaser)»로만 따로 준다 → 로그인 후 비대상이어도 보던 가격이 오르지 않음. */
+     - 카드 모양은 로그인 여부가 아니라 «할인 설정 여부»로 정한다(display).
+       비로그인(history=null): 첫 구독 할인이 설정돼 있으면 신규 손님 기준(첫 구독·일반 중 더 싼 쪽)으로 할인가 카드를 그린다.
+       청구액(applied·first)은 로그인 판정 뒤에만 정해진다 → 비로그인의 applied는 none/general 그대로. */
   function priceFor({ option, events, history, now, generalRenews }) {
     const list = option.listPrice;
     const evs = events.filter((e) => e.optionIds.includes(option.id) && e.method === "price" && activeAt(e, now));
@@ -53,19 +55,21 @@
     const firstEv = best("first_sub");
     const base = general ? general.amount : list;
     const recurring = general && generalRenews ? general.amount : list;
-    const out = { list, general, firstEvent: firstEv, judge: null, applied: general ? "general" : "none", first: base, recurring, teaser: null };
-    if (!firstEv) return out;
+    const out = { list, general, firstEvent: firstEv, judge: null, applied: general ? "general" : "none", first: base, recurring, display: null };
+    const show = (kind) => {
+      out.display = kind === "first" ? { kind, amount: firstEv.amount, recurring, event: firstEv.event }
+        : kind === "general" ? { kind, amount: general.amount, recurring, event: general.event } : { kind: "none", amount: list, recurring: list, event: null };
+      return out;
+    };
+    if (!firstEv) return show(out.applied);
     const j = judge(history, { includeTrialUsers: firstEv.event.includeTrialUsers });
     out.judge = j;
-    if (j.state === "unknown") {
-      if (firstEv.amount < base) out.teaser = { amount: firstEv.amount, recurring: list };
-      return out;
-    }
+    if (j.state === "unknown") return show(firstEv.amount < base ? "first" : out.applied);
     if (j.state === "eligible" && firstEv.amount < base) {
       out.applied = "first";
       out.first = firstEv.amount;
     }
-    return out;
+    return show(out.applied);
   }
 
   // 견적(결제진행 화면에서 발급, 서버 저장) — 결제 승인 때 이 값으로만 청구한다
@@ -85,7 +89,7 @@
     const ev = ctx.events.find((e) => e.id === quote.eventId);
     if (!ev) return { result: "changed", why: "이벤트 삭제" };
     // 이벤트 종료 경계: 종료 전에 받은 견적은 유효시간 안이면 인정(선착순 자리도 견적 때 잡아 둠)
-    if (quote.issuedAt > ev.end) return { result: "changed", why: "이벤트 종료 후 견적" };
+    if (ev.end != null && quote.issuedAt > ev.end) return { result: "changed", why: "이벤트 종료 후 견적" };
     const j = judge(ctx.history, { includeTrialUsers: ev.includeTrialUsers, quoteId: quote.id });
     if (j.state !== "eligible") return { result: "changed", why: j.reason };
     return { result: "ok" };
@@ -94,7 +98,16 @@
   // 구독 회차별 청구 금액
   function chargeFor(sub, n) { return n === 1 ? sub.firstAmount : sub.recurringAmount; }
 
+  // 타임세일 카드 아래 «10일 11:45:55 남음». 종료일 없는 이벤트는 null
+  function remainLabel(end, now) {
+    if (end == null) return null;
+    const t = (x) => new Date(x.replace(" ", "T") + (x.length <= 16 ? ":00" : "") + "+09:00").getTime();
+    let s = Math.max(0, Math.floor((t(end) - t(now)) / 1000) + 59);
+    const d = Math.floor(s / 86400); s %= 86400;
+    const p = (n) => String(n).padStart(2, "0");
+    return `${d ? d + "일 " : ""}${p(Math.floor(s / 3600))}:${p(Math.floor((s % 3600) / 60))}:${p(s % 60)} 남음`;
+  }
   const won = (n) => Math.round(n).toLocaleString("ko-KR");
-  const api = { MIN_FIRST_AMOUNT, QUOTE_TTL_MIN, discountOf, validateDiscount, judge, priceFor, makeQuote, revalidate, chargeFor, addMin, won, activeAt };
+  const api = { MIN_FIRST_AMOUNT, QUOTE_TTL_MIN, discountOf, validateDiscount, judge, priceFor, makeQuote, revalidate, chargeFor, addMin, won, activeAt, remainLabel };
   if (typeof module !== "undefined") module.exports = api; else root.FSE = api;
 })(typeof window !== "undefined" ? window : globalThis);

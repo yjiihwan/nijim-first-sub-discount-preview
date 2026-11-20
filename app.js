@@ -15,6 +15,8 @@
     center: qs.get("c") || "doksan",
     overlap: qs.get("ov") === "1",
     renew: qs.get("renew") === "1",
+    noEnd: qs.get("end") === "0",
+    noFs: qs.get("fs") === "0",
     sim: qs.get("sim") || "ok",
     af: { method: "all", target: qs.get("tf") || "all", status: "all", limit: "all" },
     form: null,
@@ -30,8 +32,10 @@
     if (ex) for (const k of ["payments", "usages", "claims"]) base[k] = (base[k] || []).concat(ex[k] || []);
     return base;
   }
+  // 조작판 «할인 종료일 없음»: 회원 화면에서 종료일 없는 할인(→ 이벤트 할인가 카드)으로 바꿔 봄
+  function shopEvents() { return events().filter((e) => e.center === ui.center && !(ui.noFs && e.target === "first_sub")).map((e) => (ui.noEnd ? Object.assign({}, e, { end: null }) : e)); }
   function price() {
-    return E.priceFor({ option: S.SUB_OPTION, events: events().filter((e) => e.center === ui.center), history: history(), now: S.NOW, generalRenews: ui.renew });
+    return E.priceFor({ option: S.SUB_OPTION, events: shopEvents(), history: history(), now: S.NOW, generalRenews: ui.renew });
   }
   function toast(t) { document.querySelectorAll(".saved").forEach((x) => x.remove()); const d = document.createElement("div"); d.className = "saved"; d.textContent = t; document.body.appendChild(d); setTimeout(() => d.remove(), 1800); }
   function modal(html) { document.getElementById("modal").innerHTML = html ? `<div class="dim c"><div class="mdl">${html}</div></div>` : ""; }
@@ -39,28 +43,40 @@
   // ───────── 회원: 센터 상세 (형 캡처 01·02 구조 그대로) ─────────
   const CHECKS = ["월 정기결제 멤버십", "한꺼번에 결제말고 월 구독!", "언제든 구독해지 가능!"];
   const ICO_CHK = `<svg viewBox="0 0 20 20" width="17" height="17"><circle cx="10" cy="10" r="10" fill="#16B364"/><path d="M5.6 10.3l2.9 2.8 5.9-6" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
-  function subCard(pr) {
-    const o = S.SUB_OPTION;
-    if (pr.applied === "first") {
-      return `<div class="card ev fs" data-buy="1"><span class="ebadge fsb">첫 구독<br>할인가</span>
-        <div class="c1">${o.label}</div><div class="c2">${o.usage}</div>
-        <div class="c3"><span class="lp">${won(pr.list)}원</span><span class="big">첫 달 ${won(pr.first)}원</span><span class="nx">다음 달부터 월 ${won(pr.recurring)}원</span></div></div>`;
-    }
-    if (pr.applied === "general") {
-      return `<div class="card ev" data-buy="1"><span class="ebadge">이벤트<br>할인가</span>
-        <div class="c1">${o.label}</div><div class="c2">${o.usage}</div>
-        <div class="c3"><span class="lp">${won(pr.list)}원</span><span class="big">월 ${won(pr.general.amount)}원</span></div></div>`;
-    }
-    return `<div class="card" data-buy="1"><div class="c1">${o.label}</div><div class="c2">${o.usage}</div><div class="c3"><span class="one">월 ${won(pr.list)}원</span></div></div>`;
+  /* 실서비스 상품 카드 3가지 모양(구독·일반 상품 공통)
+     - 할인 없음: 검은 머리 정가 카드
+     - 할인 + 종료일 없음: 빨간 머리 «이벤트 할인가» 카드
+     - 할인 + 종료일 있음: 노란 머리 «TIME SALE» 카드 + 카드 밖 아래 남은 시간 */
+  function card({ head, sub, lp, mid, big, nx, end, badge, buy }) {
+    const disc = lp != null, ts = disc && end != null;
+    const kind = !disc ? "" : ts ? "ts" : "ev";
+    const bd = !disc ? "" : ts ? `<span class="tsbadge"><i>TIME<br>SALE</i></span>` : `<span class="ebadge ${badge === "first" ? "fsb" : ""}">${badge === "first" ? "첫구독<br>할인가" : "이벤트<br>할인가"}</span>`;
+    const body = !disc ? `<span class="one">${big}</span>`
+      : `<span class="lp">${won(lp)}원</span>${mid ? `<span class="p">${mid}</span>` : ""}<span class="big">${big}</span>${nx ? `<span class="nx">${nx}</span>` : ""}`;
+    const left = ts ? E.remainLabel(end, S.NOW) : null;
+    return `<div class="cw"><div class="card ${kind} ${nx ? "fs" : ""}" ${buy ? 'data-buy="1"' : ""}>${bd}<div class="c1">${head}</div><div class="c2">${sub}</div><div class="c3">${body}</div></div>${left ? `<div class="left">${left}</div>` : ""}</div>`;
   }
-  function teaser(pr) {
-    if (!pr.teaser) return "";
-    return `<button class="fs-teaser" data-login="1"><span class="t1">🎁 이 센터 첫 구독이면 <b>첫 달 ${won(pr.teaser.amount)}원</b></span><span class="t2">로그인하고 확인 ›</span></button>`;
+  function subCard(pr) {
+    const o = S.SUB_OPTION, d = pr.display, end = d.event ? d.event.end : null;
+    if (d.kind === "first") {
+      return card({ head: o.label, sub: o.usage, lp: pr.list, mid: end != null ? "첫 구독 할인가" : null, big: `첫 달 ${won(d.amount)}원`, nx: `다음 달부터 월 ${won(d.recurring)}원`, end, badge: "first", buy: 1 });
+    }
+    if (d.kind === "general") return card({ head: o.label, sub: o.usage, lp: pr.list, big: `월 ${won(d.amount)}원`, end, buy: 1 });
+    return card({ head: o.label, sub: o.usage, big: `월 ${won(pr.list)}원`, buy: 1 });
+  }
+  const NOT_REASON = { "이미 첫 구독 할인을 받음": "이미 첫 구독 할인을 받으셨어요", "다른 결제가 진행 중": "다른 결제가 진행 중이에요", "이 센터 결제 이력 있음": "이 센터 결제 이력이 있어요", "이 센터 이용 이력 있음": "이 센터 이용 이력이 있어요", "무료 체험권 이용 회원(대상 제외 설정)": "무료 체험권을 이용하셨어요" };
+  // 로그인 후 비대상: 첫 구독 할인이 신규 손님에게 보였을 상품이면 안내 한 줄(카드는 이미 본인 가격으로 그려짐)
+  function notTarget(pr) {
+    const fe = pr.firstEvent, base = pr.general ? pr.general.amount : pr.list;
+    if (!fe || !pr.judge || pr.judge.state !== "ineligible" || fe.amount >= base) return "";
+    return `<p class="fs-not"><b>ⓘ</b>이 센터 첫 구독 할인 대상이 아니에요<span>${esc(NOT_REASON[pr.judge.reason] || pr.judge.reason)}</span></p>`;
   }
   function centerView() {
     const c = S.CENTERS[ui.center], pr = price();
-    const healthCards = [["1개월", "하루 1회 이용", 90000, 90000], ["2개월", "하루 1회 이용", 170000, 140000], ["3개월", "무제한 이용", 190000, 190000]].map(([a, b, lp, p]) =>
-      `<div class="card ${lp > p ? "ev" : ""}">${lp > p ? `<span class="ebadge">이벤트<br>할인가</span>` : ""}<div class="c1">${a}</div><div class="c2">${b}</div><div class="c3">${lp > p ? `<span class="lp">${won(lp)}원</span><span class="p">${won(p)}원</span><span class="big">월 ${won(p / 2)}원</span>` : `<span class="one">${won(p)}원</span>`}</div></div>`).join("");
+    // 일반(비구독) 상품: 2개월에 일반 할인(11-30 종료) — 종료일 있으면 TIME SALE, 없으면 이벤트 할인가
+    const hEnd = ui.noEnd ? null : "2026-11-30 23:59";
+    const healthCards = [["1개월", "하루 1회 이용", 90000, 90000, 1], ["2개월", "하루 1회 이용", 170000, 140000, 2], ["3개월", "무제한 이용", 190000, 190000, 3]].map(([a, b, lp, p, m]) =>
+      lp > p ? card({ head: a, sub: b, lp, mid: `${won(p)}원`, big: `월 ${won(p / m)}원`, end: hEnd }) : card({ head: a, sub: b, big: `${won(p)}원` })).join("");
     return `<div class="phone shop cd">
       <div class="cd-photo"><span class="cb l">‹</span><span class="cb r1">♥</span><span class="cb r2">⇪</span><span class="cnt">3/50</span><span class="all">전체보기</span></div>
       <div class="cd-info"><h2>${esc(c.name)}</h2>
@@ -74,7 +90,7 @@
       <h3>멤버십 구매</h3>
       <h4 class="subh">헬스 구독 멤버십 <span class="subchip">✱ 구독멤버십</span></h4>
       <div class="subrow">${subCard(pr)}<div class="checks">${CHECKS.map((t) => `<div>${ICO_CHK}${t}</div>`).join("")}</div></div>
-      ${teaser(pr)}
+      ${notTarget(pr)}
       <div class="notice">☕커피&얼음 무제한 무료🧊</div>
       <h4>헬스</h4><div class="cards">${healthCards}</div>
       <div style="height:40px"></div></div>`;
@@ -284,7 +300,7 @@
     const admin = ui.view === "list" || ui.view === "form";
     const pr = price();
     const jl = pr.judge ? ({ eligible: "✅ 대상", ineligible: "⛔ 비대상", unknown: "❔ 판정 전(로그인 필요)" }[pr.judge.state] + ` · ${pr.judge.reason}`) : "이 센터 신규 할인 없음";
-    return `<div class="demo-h">신규 첫 구독 할인 시안 v1.0 <span>(실제 서비스 아님 · 더미 데이터 · 지금=${S.NOW})</span></div>
+    return `<div class="demo-h">신규 첫 구독 할인 시안 v1.1 <span>(실제 서비스 아님 · 더미 데이터 · 지금=${S.NOW})</span></div>
       <nav class="demo-nav">${VIEWS.map(([v, l]) => `<a data-v="${v}" class="${ui.view === v ? "on" : ""}">${l}</a>`).join("")}</nav>
       <div class="demo-opt">
         ${admin ? `<label>관리자 계정 <select id="o-admin">${Object.values(S.CENTERS).map((c) => `<option value="${c.id}" ${c.id === ui.center ? "selected" : ""}>${c.name} 관리자</option>`).join("")}</select></label>`
@@ -292,6 +308,8 @@
              <label>센터 <select id="o-center">${Object.values(S.CENTERS).map((c) => `<option value="${c.id}" ${c.id === ui.center ? "selected" : ""}>${c.name}</option>`).join("")}</select></label>
              <span class="jd">${esc(jl)}</span>`}
         <label><input type="checkbox" id="o-ov" ${ui.overlap ? "checked" : ""}> 일반 할인 같이 진행(월 43,800원)</label>
+        ${admin ? "" : `<label><input type="checkbox" id="o-fs" ${ui.noFs ? "checked" : ""}> 첫 구독 할인 끔</label>`}
+        ${admin ? "" : `<label><input type="checkbox" id="o-end" ${ui.noEnd ? "checked" : ""}> 할인 종료일 없음(이벤트 할인가 카드)</label>`}
         ${ui.view === "pay" ? `<label>결제 순간 <select id="o-sim">${[["ok", "정상"], ["lost", "도중에 자격 잃음"], ["end", "이벤트 종료 직전"], ["soldout", "선착순 마감 직전"], ["fail", "첫 결제 카드 실패"]].map(([v, l]) => `<option value="${v}" ${ui.sim === v ? "selected" : ""}>${l}</option>`).join("")}</select></label>` : ""}
         <button id="o-reset">처음 상태로</button>
       </div>`;
@@ -319,7 +337,8 @@
     if (t.dataset.as) {
       ui.who = t.dataset.as; modal(""); render();
       const pr = price();
-      toast(pr.applied === "first" ? `첫 구독 할인 대상이에요 · 첫 달 ${won(pr.first)}원` : "이 센터 신규 첫 구독 할인 대상이 아니에요 · 보시던 가격 그대로예요");
+      if (pr.applied === "first") toast(`첫 구독 할인 대상이에요 · 첫 달 ${won(pr.first)}원`);
+      else if (notTarget(pr)) toast(`첫 구독 할인 대상이 아니에요 · 회원님 가격 월 ${won(pr.general ? pr.general.amount : pr.list)}원`);
       return;
     }
     if (t.dataset.pay) return doPay();
@@ -336,6 +355,8 @@
     if (t.id === "o-who") { ui.who = t.value; return render(); }
     if (t.id === "o-center" || t.id === "o-admin") { ui.center = t.value; ui.form = null; return render(); }
     if (t.id === "o-ov") { ui.overlap = t.checked; return render(); }
+    if (t.id === "o-fs") { ui.noFs = t.checked; return render(); }
+    if (t.id === "o-end") { ui.noEnd = t.checked; return render(); }
     if (t.id === "o-sim") { ui.sim = t.value; return; }
     if (!ui.form) return;
     if (t.dataset.cat !== undefined) { ui.form.cat = t.value; ui.form.opts = []; ui.form.target = "all"; return render(); }
