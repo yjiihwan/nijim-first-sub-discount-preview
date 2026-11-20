@@ -3,40 +3,62 @@
 .demo select{height:24px;border-radius:5px;border:0;font-size:12px;max-width:200px}
 .demo .jd{background:#353B4A;border-radius:5px;padding:3px 8px}
 
-/* ── 회원: 센터 상세 상단 (형 캡처 01·02) ── */
-.cd-photo{height:280px;position:relative;background:linear-gradient(160deg,#5B5F6B 0%,#2E3038 55%,#6E4A86 100%)}
-.cd-photo .cb{position:absolute;top:56px;width:43px;height:43px;border-radius:50%;background:rgba(240,240,240,.82);display:flex;align-items:center;justify-content:center;font-size:22px;color:#222}
-.cd-photo .cb.l{left:16px}.cd-photo .cb.r1{right:66px;color:#F0457B}.cd-photo .cb.r2{right:16px;font-size:18px}
-.cd-photo .cnt{position:absolute;left:50%;bottom:22px;transform:translateX(-50%);color:#fff;font-weight:700;font-size:14px}
-.cd-photo .all{position:absolute;right:16px;bottom:14px;background:rgba(240,240,240,.85);border-radius:999px;padding:7px 14px;font-size:13px;font-weight:700}
-.cd-info{padding:20px 16px 18px}
-.cd-info h2{font-size:24px;font-weight:800;letter-spacing:-0.5px}
-.cd-meta{display:flex;align-items:center;gap:16px;margin-top:12px;font-size:14px;font-weight:700}
-.cd-meta .ht{color:#F0457B}.cd-meta .st{color:#F5B400}.cd-meta i{font-style:normal;color:#999;margin-left:2px}
-.cd-meta .rp{margin-left:auto;border:1.5px solid #F2C21B;border-radius:6px;padding:3px 7px;font-size:12px;display:flex;align-items:center;gap:4px}
-.cd-meta .rp b{width:15px;height:15px;border-radius:50%;background:#F2C21B;color:#fff;font-size:9px;display:inline-flex;align-items:center;justify-content:center}
-.cd-btns{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:16px}
-.cd-btns span{height:36px;border-radius:999px;background:#F1F3F7;display:flex;align-items:center;justify-content:center;gap:6px;font-size:14px;font-weight:700;color:#2061D8}
-.cd-btns span.gr{color:#1E9A55}.cd-btns span:last-child{color:#222}
-.cd-btns b.kk{background:#FAE100;color:#3A1D1D;font-size:8px;border-radius:5px;padding:2px 3px}
-.cd-line{display:flex;gap:6px;align-items:flex-start;background:#F1F2F4;border-radius:6px;padding:9px 10px;margin-top:10px;font-size:13.5px;line-height:1.5}
-.cd-line .k{flex:none;width:50px;font-weight:600}.cd-line .k.ev{color:#E8336D}.cd-line .k.nt{color:#E8336D}
-.cd-line .ar{flex:none;color:#E8336D;font-size:9px;margin-top:3px}
-.cd-line .v{flex:1;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-weight:600}
-.cd-line .dn{flex:none;color:#555}
-.cd-gap{height:10px;background:#F2F3F5}
-.shop .subh{display:flex;align-items:center;gap:6px}
-.subchip{background:#16A267;color:#fff;font-size:12px;font-weight:700;border-radius:999px;padding:3px 9px}
-.subrow{display:flex;align-items:flex-start;gap:14px;padding:22px 16px 6px 22px}
-.subrow .cw{flex:none;width:131px}
-.subrow .checks{flex:1;display:flex;flex-direction:column;gap:8px;min-width:0}
-.subrow .checks div{height:25px;border-radius:999px;background:#F1F2F4;display:flex;align-items:center;gap:5px;padding:0 8px;font-size:11.5px;font-weight:600;white-space:nowrap;overflow:hidden}
-.subrow .checks svg{flex:none;width:14px;height:14px}
+/* ── 회원: 센터 상세 상단 (v1.3: 실서비스 캡처 01·02를 390폭으로 환산해 맞춤 — 590px 캡처 ÷1.513) ── */
+.phone{font-family:'Apple SD Gothic Neo',-apple-system,Pretendard,sans-serif;letter-spacing:0}
+.cd-photo{height:279px;position:relative;background:#3A3D44 url(img/center_photo.jpg) center/cover no-repeat}
+.cd-photo .cb{position:absolute;top:58px;width:43px;height:43px;border-radius:50%;background:rgba(236,236,240,.88);display:flex;align-items:center;justify-content:center}
+.cd-photo .cb.l{left:16px}.cd-photo .cb.l svg{margin-left:-2px}
+.cd-photo .cb.r1{right:72px}.cd-photo .cb.r1 svg{margin-top:2px}
+.cd-photo .cb.r2{right:16px}.cd-photo .cb.r2 svg{margin-top:-2px}
+.cd-photo .cnt{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);color:#fff;font-weight:700;font-size:13.5px;text-shadow:0 0 3px rgba(0,0,0,.35)}
+.cd-photo .all{position:absolute;right:10px;bottom:15px;height:29px;display:flex;align-items:center;background:rgba(240,240,242,.9);border-radius:999px;padding:0 14px;font-size:13px;font-weight:600;color:#111}
+.cd-info{padding:25px 16px 17px}
+.cd-info h2{font-size:24px;font-weight:700;line-height:29px;letter-spacing:-0.3px;color:#000}
+.cd-meta{display:flex;align-items:center;margin-top:12px;height:19px;font-size:14px;font-weight:600;color:#000}
+.cd-meta .lk{display:flex;align-items:center;gap:5px;font-size:15.5px;font-weight:700}
+.cd-meta .rv{display:flex;align-items:center;gap:4px;margin-left:14px;font-size:13.5px;font-weight:700}
+.cd-meta .rv i{width:16px;height:16px;border-radius:50%;background:#EEEFF1;display:inline-flex;align-items:center;justify-content:center;margin-left:1px}
+.cd-meta .rp{margin-left:auto;height:20px;border:1.5px solid #F5C518;border-radius:5px;padding:0 6px 0 4px;font-size:11px;font-weight:600;display:flex;align-items:center;gap:4px}
+.cd-meta .rp b{width:14px;height:14px;border-radius:50%;background:#F9C400;box-shadow:inset 0 0 0 1.2px #E5AE00;color:#fff;font-size:8.5px;font-weight:800;display:inline-flex;align-items:center;justify-content:center}
+.cd-btns{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;margin-top:12px}
+.cd-btns span{height:35px;border-radius:999px;background:#F7F8FA;display:flex;align-items:center;justify-content:center;gap:7px;font-size:14px;font-weight:600;color:#1A7FEC}
+.cd-btns span.gr{color:#47A84B;gap:10px}.cd-btns span.kt{color:#232524;gap:8px}
+.cd-btns b.kk{width:19px;height:19px;border-radius:5px;background:#FFE600;color:#3A1D1D;font-size:8.5px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;letter-spacing:-0.3px}
+.cd-line{position:relative;display:flex;align-items:flex-start;background:#F2F2F2;border-radius:6px;padding:8px 14px 8px 8px;margin-top:17px;font-size:14px;line-height:19.5px;min-height:55px}
+.cd-line+.cd-line{margin-top:8px}
+.cd-line .k{flex:none;width:46px;font-weight:500;color:#E0336A}
+.cd-line .ar{flex:none;width:0;height:0;margin:5px 10px 0 2px;border-left:7px solid #F60036;border-top:4.5px solid transparent;border-bottom:4.5px solid transparent}
+.cd-line .v{flex:1;min-width:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-weight:700;color:#000;word-break:break-all}
+.cd-line .dn{flex:none;width:10px;margin:7px -4px 0 14px;display:flex}
+.cd-gap{height:10px;background:#F3F4F6}
+.shop .ins{margin:16px 16px 0;background:#F3F4F6;height:32px;gap:5px;padding:0 12px;font-size:14px;color:#111}
+.shop .ins svg{flex:none}
+.shop .ins b{font-weight:700}
+.shop h3{font-size:17px;font-weight:600;letter-spacing:-0.2px;line-height:20px;margin:18px 16px 0;color:#000}
+.shop h4{font-size:17px;font-weight:600;letter-spacing:-0.2px;line-height:22px;margin:17px 16px 0;color:#000}
+.shop .subh{display:flex;align-items:center;gap:7px}
+.subchip{height:22px;display:inline-flex;align-items:center;gap:4px;background:#19B977;color:#fff;font-size:13.5px;font-weight:600;border-radius:999px;padding:0 9px 0 4px;letter-spacing:-0.2px}
+.subrow{display:flex;align-items:flex-start;gap:19px;padding:20px 16px 0 22px}
+.subrow .cw{flex:none;width:130px}
+.subrow.has-rm{padding-top:27px}
+.subrow .card{width:130px}
+.subrow .checks{flex:1;display:flex;flex-direction:column;gap:7px;min-width:0;margin-top:1px}
+.subrow .checks div{height:26px;border-radius:999px;background:#F1F1F1;display:flex;align-items:center;gap:4px;padding:0 8px;font-size:12px;font-weight:500;color:#222;white-space:nowrap;overflow:hidden}
+.subrow .checks svg{flex:none;width:16px;height:16px}
+.shop .notice{margin:11px 16px 0;background:#F2F2F2;border-radius:8px;padding:0 14px;height:44px;display:flex;align-items:center;font-size:14px;line-height:1.3;color:#111}
+.shop .notice+h4{margin-top:21px}
+/* 실서비스 카드 글자 크기(캡처 01 기준): 머리 12.5 굵게 · 둘째 줄 11 · 정가 10.5 · 할인가 13 굵게, 본문 높이 49 */
+.card .c1{font-size:12.5px;font-weight:700}
+.card .c2{font-size:11px;font-weight:600}
+.card .c3{height:49px;font-size:10.5px}
+.card .c3 .p{font-size:10.5px}
+.card .c3 .big,.card .c3 .one{font-size:13px;font-weight:700}
+.card .ebadge{font-weight:600}
 /* 첫 구독 할인가 카드: 기존 이벤트 카드와 같은 틀, 본문 3줄 */
-.card.fs .c3{gap:0}
-.card.ts.fs .c3 .p{font-size:9px;font-weight:700;line-height:1.25}
-.card.fs .c3 .big{font-size:12px}
-.card.fs .c3 .nx{font-size:9px;color:#777;margin-top:1px}
+.card.fs .c3{gap:0;height:auto;min-height:49px;padding:5px 0}
+.card.ts.fs .c3 .p{font-size:9.5px;font-weight:700;line-height:1.25}
+.card.fs .c3 .big{font-size:12.5px}
+.card.fs .c3 .nx{font-size:9.5px;color:#777;margin-top:1px}
 .card .ebadge.fsb{font-size:7.2px;letter-spacing:-0.4px}
 .fs-not{display:flex;align-items:center;flex-wrap:wrap;gap:2px 5px;margin:12px 16px 0 22px;font-size:12.5px;color:#444;font-weight:600}
 .fs-not b{color:#8A8F99;font-weight:700}
@@ -159,11 +181,49 @@
 .dbox .dg{margin-top:14px}
 
 /* ── 실서비스 타임세일 카드(이벤트 종료일 있는 할인, 구독·일반 공통 — 형 참고 화면) ── */
-.cw{flex:none;width:131px;display:flex;flex-direction:column;align-items:center}
+.cw{flex:none;width:131px;display:flex;flex-direction:column;align-items:center;position:relative}
 .card.ts .c1{background:#F4E500;color:#111}
 .card.ts .c2{background:#FFFAC0}
 .card.ts .c3 .p{color:#D11}
 .card.ts .c3 .big{color:#D11}
 .tsbadge{position:absolute;left:-13px;top:-11px;width:33px;height:33px;border-radius:50%;background:conic-gradient(from 200deg,#FFF1A8 0 28%,#FFB11B 28% 62%,#FF8A1E 62% 100%);display:flex;align-items:center;justify-content:center;box-shadow:0 1px 2px rgba(0,0,0,.18);z-index:1}
 .tsbadge i{width:27px;height:27px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#FF4A3D,#E3161E 70%);color:#fff;font-style:normal;font-weight:700;font-size:7.4px;line-height:1.05;letter-spacing:-0.2px;display:flex;align-items:center;justify-content:center;text-align:center}
-.cw .left{margin-top:3px;font-size:10px;color:#8A1538;white-space:nowrap;letter-spacing:-0.1px}
+.cw .left{margin-top:3px;font-size:11px;color:#7A1F3A;white-space:nowrap;letter-spacing:-0.1px}
+/* v1.3 선착순 남은 장수(1~10장일 때만): 카드 위 가운데 «⏰ N장 남음» + 딱지 «마감 임박» — 형 참고 화면(실서비스) 기준.
+   카드 밖 위쪽 여백(줄 위 패딩 22~24px) 안에 띄워서 카드 높이·옆 카드 줄은 그대로 */
+.cw .rm{position:absolute;left:0;right:0;top:-15px;height:14px;display:flex;align-items:center;justify-content:center;gap:3px;font-size:11px;line-height:14px;color:#C9302C;white-space:nowrap;pointer-events:none}
+.cw .rm svg{flex:none}
+.tsbadge.mg{left:-13px;top:-15px;width:34px;height:34px;background:conic-gradient(from 10deg,#FFF4C8 0 14%,#FBBD12 14% 100%)}
+.tsbadge.mg i{width:28px;height:28px;background:#F32227;font-size:8.6px;font-weight:600;line-height:1.12;letter-spacing:-0.3px}
+
+/* v1.3 관리자: 실서비스 캡처 03·06(1280px ÷1.072 = 1194 CSS px)에 글자·칸 크기 맞춤 */
+.ah h1{font-size:21px;font-weight:600}
+.fr{min-height:38px;font-size:12px}
+.fk{width:84px;font-size:12px}
+.pl{height:30px;padding:0 12px;font-size:12px}
+.abox.flt .dt{height:38px;width:150px}
+.sel{height:40px;width:180px}.sel.s2{width:110px}
+.cb{font-size:12px;gap:11px}
+.cb i{width:18px;height:18px;border-radius:4px}
+.ck.on i::after,.cb.on i::after{left:5px;top:1px;width:5px;height:9px}
+.opts{gap:16px}
+.lb{font-size:11.5px}
+.inp{height:40px;width:268px}
+.ut button{height:30px;width:40px;font-size:12px}
+.cb.sm{font-size:11.5px}
+.ap{font-size:13.5px}
+.ob{border-color:#8C95A8;color:#3A4254;height:36px;padding:0 30px;font-size:12px}
+.pb{height:36px;padding:0 30px;font-size:12px}
+.pl{border-color:#D5D9E0;color:#555}
+.sel::after{content:"";width:7px;height:7px;border:solid #333;border-width:0 1.6px 1.6px 0;transform:rotate(45deg) translateY(-3px)}
+.ment .ta{height:84px}
+.inp.dt2{width:100%;height:38px}
+.lb{font-weight:600;color:#4B5563}
+.fbtns .pb,.fbtns .gb{height:40px;font-size:13px}
+/* v1.3 결제진행: 실서비스 캡처(1179px ÷3)에 맞춤 — 머리 높이·제목 크기·첫 줄 위 여백 */
+.rx-hd{height:55px}
+.rx-hd h1{font-size:17.5px;font-weight:600}
+.rx-bk{top:20px}
+.rx-body{padding-top:12px}
+.rx-row{font-size:15px}
+.mdl p{word-break:keep-all}

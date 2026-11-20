@@ -37,7 +37,7 @@
     return { state: "eligible", reason: trial ? "무료 체험권만 이용(대상 포함 설정)" : "이 센터 이력 없음" };
   }
 
-  function activeAt(ev, now) { return ev.status !== "ended" && ev.start <= now && (ev.end == null || now <= ev.end) && (ev.limit == null || ev.sold < ev.limit); }
+  function activeAt(ev, now) { return ev.status !== "ended" && ev.start <= now && (ev.end == null || now <= ev.end) && (ev.limit == null || (ev.sold || 0) + (ev.held || 0) < ev.limit); }
 
   /* 한 구독 상품 옵션의 회원별 가격.
      - 일반 할인(target=all)과 신규 첫 구독(target=first_sub)은 더하지 않는다. 1회차 결제금액이 더 싼 쪽 하나. 같으면 일반 할인(1회 한정 자격을 아껴 둠).
@@ -107,7 +107,13 @@
     const p = (n) => String(n).padStart(2, "0");
     return `${d ? d + "일 " : ""}${p(Math.floor(s / 3600))}:${p(Math.floor((s % 3600) / 60))}:${p(s % 60)} 남음`;
   }
+  /* 선착순 «N장 남음» 표시(v1.3). 남은 장수 = 선착순 수량 − 판매 − 잡아 둔 자리(held).
+     선착순 미설정(limit=null) → 표시 안 함. 1~10장 → 표시(카드 위 «⏰ N장 남음» + 딱지 «마감 임박»). 11장 이상 → 표시 안 함.
+     0장 = 매진 → activeAt()이 이벤트를 빼서 카드가 정가/일반가로 돌아감(기존 규칙, 새 화면 없음). */
+  const REMAIN_SHOW_MAX = 10;
+  function remainOf(ev) { if (!ev || ev.limit == null) return null; return Math.max(0, ev.limit - (ev.sold || 0) - (ev.held || 0)); }
+  function showRemain(ev) { const r = remainOf(ev); return r != null && r >= 1 && r <= REMAIN_SHOW_MAX ? r : null; }
   const won = (n) => Math.round(n).toLocaleString("ko-KR");
-  const api = { MIN_FIRST_AMOUNT, QUOTE_TTL_MIN, discountOf, validateDiscount, judge, priceFor, makeQuote, revalidate, chargeFor, addMin, won, activeAt, remainLabel };
+  const api = { MIN_FIRST_AMOUNT, QUOTE_TTL_MIN, discountOf, validateDiscount, judge, priceFor, makeQuote, revalidate, chargeFor, addMin, won, activeAt, remainLabel, REMAIN_SHOW_MAX, remainOf, showRemain };
   if (typeof module !== "undefined") module.exports = api; else root.FSE = api;
 })(typeof window !== "undefined" ? window : globalThis);
