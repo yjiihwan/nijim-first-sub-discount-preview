@@ -1,0 +1,157 @@
+/* 신규 첫 구독 할인 — base.css(증정 시안의 실서비스 재현 스타일) 위에 얹는 것만 */
+#app.admin{background:#1E1F23;min-height:100vh}
+.demo select{height:24px;border-radius:5px;border:0;font-size:12px;max-width:200px}
+.demo .jd{background:#353B4A;border-radius:5px;padding:3px 8px}
+
+/* ── 회원: 센터 상세 상단 (형 캡처 01·02) ── */
+.cd-photo{height:280px;position:relative;background:linear-gradient(160deg,#5B5F6B 0%,#2E3038 55%,#6E4A86 100%)}
+.cd-photo .cb{position:absolute;top:56px;width:43px;height:43px;border-radius:50%;background:rgba(240,240,240,.82);display:flex;align-items:center;justify-content:center;font-size:22px;color:#222}
+.cd-photo .cb.l{left:16px}.cd-photo .cb.r1{right:66px;color:#F0457B}.cd-photo .cb.r2{right:16px;font-size:18px}
+.cd-photo .cnt{position:absolute;left:50%;bottom:22px;transform:translateX(-50%);color:#fff;font-weight:700;font-size:14px}
+.cd-photo .all{position:absolute;right:16px;bottom:14px;background:rgba(240,240,240,.85);border-radius:999px;padding:7px 14px;font-size:13px;font-weight:700}
+.cd-info{padding:20px 16px 18px}
+.cd-info h2{font-size:24px;font-weight:800;letter-spacing:-0.5px}
+.cd-meta{display:flex;align-items:center;gap:16px;margin-top:12px;font-size:14px;font-weight:700}
+.cd-meta .ht{color:#F0457B}.cd-meta .st{color:#F5B400}.cd-meta i{font-style:normal;color:#999;margin-left:2px}
+.cd-meta .rp{margin-left:auto;border:1.5px solid #F2C21B;border-radius:6px;padding:3px 7px;font-size:12px;display:flex;align-items:center;gap:4px}
+.cd-meta .rp b{width:15px;height:15px;border-radius:50%;background:#F2C21B;color:#fff;font-size:9px;display:inline-flex;align-items:center;justify-content:center}
+.cd-btns{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:16px}
+.cd-btns span{height:36px;border-radius:999px;background:#F1F3F7;display:flex;align-items:center;justify-content:center;gap:6px;font-size:14px;font-weight:700;color:#2061D8}
+.cd-btns span.gr{color:#1E9A55}.cd-btns span:last-child{color:#222}
+.cd-btns b.kk{background:#FAE100;color:#3A1D1D;font-size:8px;border-radius:5px;padding:2px 3px}
+.cd-line{display:flex;gap:6px;align-items:flex-start;background:#F1F2F4;border-radius:6px;padding:9px 10px;margin-top:10px;font-size:13.5px;line-height:1.5}
+.cd-line .k{flex:none;width:50px;font-weight:600}.cd-line .k.ev{color:#E8336D}.cd-line .k.nt{color:#E8336D}
+.cd-line .ar{flex:none;color:#E8336D;font-size:9px;margin-top:3px}
+.cd-line .v{flex:1;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-weight:600}
+.cd-line .dn{flex:none;color:#555}
+.cd-gap{height:10px;background:#F2F3F5}
+.shop .subh{display:flex;align-items:center;gap:6px}
+.subchip{background:#16A267;color:#fff;font-size:12px;font-weight:700;border-radius:999px;padding:3px 9px}
+.subrow{display:flex;align-items:flex-start;gap:14px;padding:22px 16px 6px 22px}
+.subrow .card{width:131px}
+.subrow .checks{flex:1;display:flex;flex-direction:column;gap:8px;min-width:0}
+.subrow .checks div{height:25px;border-radius:999px;background:#F1F2F4;display:flex;align-items:center;gap:5px;padding:0 8px;font-size:11.5px;font-weight:600;white-space:nowrap;overflow:hidden}
+.subrow .checks svg{flex:none;width:14px;height:14px}
+/* 첫 구독 할인가 카드: 기존 이벤트 카드와 같은 틀, 본문 3줄 */
+.card.fs .c3{gap:0}
+.card.fs .c3 .big{font-size:12px}
+.card.fs .c3 .nx{font-size:9px;color:#777;margin-top:1px}
+.card .ebadge.fsb{font-size:7.2px;letter-spacing:-0.4px}
+.fs-teaser{display:flex;align-items:center;justify-content:space-between;gap:6px;width:calc(100% - 32px);margin:10px 16px 0;border:1px solid #F6C6D5;background:#FFF2F6;border-radius:8px;padding:9px 12px;font-size:13px;color:#222;text-align:left}
+.fs-teaser .t1 b{color:#D11}
+.fs-teaser .t2{flex:none;color:#E8336D;font-weight:700;font-size:12.5px}
+
+/* ── 회원: 결제진행 추가분 ── */
+.fs-plan{margin:14px 0 4px;background:#FFF2F6;border:1px solid #F8CFDC;border-radius:10px;padding:12px 14px}
+.fs-plan .h{font-size:14.5px;font-weight:700;line-height:1.45}
+.fs-plan .h b{color:#FF1E66}
+.fs-plan .tl{margin-top:8px;border-top:1px dashed #F3B4C6;padding-top:6px}
+.fs-plan .tl div{display:flex;align-items:center;gap:8px;font-size:13px;height:24px}
+.fs-plan .tl .n{width:104px;color:#444}.fs-plan .tl .d{flex:1;color:#888}.fs-plan .tl b{font-weight:800}.fs-plan .tl b.pk{color:#FF1E66}
+.fs-plan p{font-size:12px;color:#888;margin-top:6px}
+.fs-plan.sm{margin-top:14px}
+.rx-bar .b4{text-align:right;font-size:12.5px;color:#555;margin-top:2px}
+.rx.pay{padding-bottom:250px}
+
+/* ── 회원: 결제 완료 ── */
+.fs-done{margin-top:22px;border-top:1px solid #EEE}
+.fs-done .r{display:flex;gap:10px;padding:12px 2px;border-bottom:1px solid #EEE;font-size:14px}
+.fs-done .k{width:72px;flex:none;color:#6B7280}
+.fs-done .v{flex:1;line-height:1.5}
+.fs-done .v em{display:inline-block;margin-left:6px;font-style:normal;font-size:11.5px;color:#E8336D;border:1px solid #F6C6D5;border-radius:4px;padding:0 5px}
+.fs-edge{margin-top:12px;font-size:12.5px;color:#6B7280;background:#F4F5F7;border-radius:8px;padding:9px 11px;line-height:1.55}
+.mdl .acts.col{flex-direction:column}
+.mdl .acts.col .btn{height:40px;font-size:14px}
+.mdl .g{color:#888;font-size:12.5px}
+.mdl .cmpp{display:flex;gap:10px;margin-top:12px;font-size:15px;background:#F6F7F9;border-radius:8px;padding:10px 12px}
+.mdl .cmpp b{color:#FF1E66}
+
+/* ── 관리자 (형 캡처 03~06, 아이패드 1194폭 기준) ── */
+.adw{padding:8px 26px 40px}
+.adp{max-width:1400px;margin:0 auto;background:#fff;border-radius:22px;padding:28px 26px 30px;color:#2B3448}
+.ah{display:flex;justify-content:space-between;align-items:flex-start}
+.ah h1{font-size:20px;font-weight:700;letter-spacing:-0.4px}
+.ah .tot{font-size:13px;color:#555;margin-top:6px}.ah .tot b{font-weight:800}
+.abtn{display:flex;gap:10px}
+.ob{height:38px;padding:0 34px;border:1px solid #2B3448;background:#fff;border-radius:3px;font-size:13px;color:#2B3448}
+.ob.sm{height:38px;padding:0 26px;margin-left:auto}
+.pb{height:38px;padding:0 34px;border:0;background:#EE2E62;color:#fff;border-radius:3px;font-size:13px;font-weight:600}
+.gb{height:44px;padding:0 22px;border:0;background:#8A95AD;color:#fff;border-radius:3px;font-size:14px;font-weight:600}
+.abox{border:1px solid #E6E8EC;border-radius:12px;margin-top:20px;padding:18px}
+.abox.flt{background:#F7F8FA;padding:14px 18px}
+.ment .mh b{font-size:13px}.ment .mh span{font-size:12px;color:#888}
+.ment .md{display:flex;justify-content:space-between;font-size:12px;color:#888;margin-top:6px}
+.ment .ta{border:1px solid #D4D8DF;border-radius:6px;height:90px;margin-top:10px;padding:10px 12px;font-size:13px}
+.ment .mrow{display:flex;align-items:center;gap:10px;margin-top:12px;font-size:13px;font-weight:600}
+.ck{display:flex;align-items:center;gap:8px}.ck i{width:20px;height:20px;border:1.5px solid #C9CDD5;border-radius:4px;display:inline-block}
+.ck.on i{background:#EE2E62;border-color:#EE2E62;position:relative}
+.ck.on i::after,.cb.on i::after{content:"";position:absolute;left:6px;top:2px;width:5px;height:10px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg)}
+.dt{height:40px;border:1px solid #D4D8DF;border-radius:4px;display:inline-flex;align-items:center;padding:0 12px;color:#9AA0AB;font-weight:400;width:160px;font-size:13px;background:#fff}
+.tl{color:#999}
+.fr{display:flex;align-items:center;gap:6px;min-height:41px;font-size:13px}
+.fk{width:100px;flex:none;color:#2B3448}
+.pl{height:32px;padding:0 13px;border:1px solid #CFD3DA;border-radius:999px;background:#fff;font-size:13px;color:#2B3448}
+.pl.on{background:#334262;border-color:#334262;color:#fff}
+.fr.new .fk::after{content:"NEW";margin-left:5px;font-size:9px;font-weight:800;color:#EE2E62;vertical-align:2px}
+.sel{height:42px;border:1px solid #CFD3DA;border-radius:6px;background:#fff;display:inline-flex;align-items:center;padding:0 14px;width:192px;justify-content:space-between}
+.sel::after{content:"⌄";font-size:14px}.sel.s2{width:118px}
+.fr .sp{flex:1}
+.tchip{display:inline-block;font-size:11px;font-weight:700;color:#D81E5B;background:#FFF0F5;border:1px solid #F7C1D3;border-radius:4px;padding:1px 6px;vertical-align:1px}
+.fs-sum{margin-top:16px;border:1px solid #F3D3DE;background:#FFF9FB;border-radius:12px;padding:14px 18px}
+.fs-sum .h{font-size:13.5px;font-weight:700}.fs-sum .h small{font-weight:400;color:#888}
+.fs-sum .tl4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:10px}
+.fs-sum .tl4 div{background:#fff;border:1px solid #F1E3E8;border-radius:8px;padding:10px 12px}
+.fs-sum .tl4 span{display:block;font-size:12px;color:#777}.fs-sum .tl4 b{font-size:17px;font-weight:800}.fs-sum .tl4 small{font-size:12px;color:#1E8260;margin-left:4px}
+.atb{width:100%;border-collapse:collapse;margin-top:26px;border-top:1.5px solid #B4BCCB}
+.atb th{font-size:12.5px;font-weight:500;color:#556;text-align:left;padding:14px 16px;border-bottom:1px solid #E6E8EC}
+.atb td{font-size:14.5px;padding:14px 16px;border-bottom:1px solid #EDEFF2;vertical-align:top;color:#333}
+.atb .r{text-align:right}
+.atb .et{font-weight:700}
+.atb .sub,.atb .sub2{font-size:12px;color:#777;margin-top:4px}
+.atb .pd{white-space:nowrap}
+.atb .empty{text-align:center;color:#999;padding:40px}
+.stc{font-size:12px;font-weight:700;border-radius:4px;padding:4px 8px}
+.stc.pre{background:#FFF1DA;color:#C77700}.stc.on{background:#E3F6EC;color:#16834C}.stc.end{background:#EEF0F3;color:#7A8291}
+.endl{margin-left:8px;font-size:13px;color:#7A8291;cursor:pointer}
+.fm{padding:0 16px 22px}
+.fh{display:flex;align-items:center;gap:10px;padding:30px 10px 26px}
+.fh h1{font-size:20px;font-weight:700}
+.fh .q{width:15px;height:15px;border:1.3px solid #7A869C;border-radius:50%;font-size:10px;display:inline-flex;align-items:center;justify-content:center;color:#7A869C}
+.fsec{border-top:1px solid #E6E8EC;padding:18px 0 20px}
+.fsec h3{font-size:14px;font-weight:700;margin-bottom:12px}
+.fsec.new{background:#FFFAFC;margin:0 -16px;padding:18px 16px 20px}
+.newtag{font-size:11px;font-weight:700;color:#EE2E62;border:1px solid #F7C1D3;border-radius:4px;padding:1px 6px;margin-left:6px;vertical-align:1px}
+.seg{display:inline-flex;background:#EEF0F4;border-radius:8px;padding:4px;margin-left:16px}
+.seg button{height:40px;min-width:120px;padding:0 18px;border:0;background:transparent;border-radius:6px;font-size:13px;color:#7A8291}
+.seg button.on{background:#334262;color:#fff;font-weight:700}
+.hint{font-size:12px;color:#666;margin:10px 0 0 16px;line-height:1.6}.hint.s{margin-top:4px;color:#888}
+.ovl{margin:10px 0 0 16px;font-size:12.5px;color:#7A4B00;background:#FFF6E0;border-radius:6px;padding:8px 12px;display:inline-block}
+.sel2{margin-left:16px;height:42px;width:220px;border:1px solid #C9CDD5;border-radius:6px;padding:0 12px;font-size:13px;background:#fff}
+.opts{display:flex;flex-direction:column;gap:12px;margin-left:16px}
+.cb{display:flex;align-items:center;gap:12px;font-size:13px;font-weight:600;cursor:pointer;position:relative}
+.cb input{position:absolute;opacity:0;width:20px;height:20px;margin:0}
+.cb i{width:21px;height:21px;border:1.5px solid #C9CDD5;border-radius:5px;flex:none;position:relative;background:#fff}
+.cb.on i{background:#EE2E62;border-color:#EE2E62}
+.cb.sm{margin:10px 0 0 16px;font-size:12.5px}
+.dbox{border:1px solid #E6E8EC;border-radius:10px;background:#FAFBFC;padding:16px 18px;margin-left:12px}
+.dbox+.dbox{margin-top:10px}
+.dh b{font-size:13.5px}.dh span{font-size:12.5px;color:#666;margin-left:6px}
+.dg{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:12px}
+.lb{font-size:12.5px;color:#444;margin-bottom:8px}
+.ir{display:flex;align-items:center;gap:10px}
+.inp{height:42px;border:1px solid #C9CDD5;border-radius:6px;padding:0 12px;font-size:13px;width:286px;background:#fff}
+.inp.lim{width:164px}.inp.dis{background:#E7EAEF;border-color:#E7EAEF}
+.ut{display:inline-flex;background:#EEF0F4;border-radius:6px;padding:3px}
+.ut button{height:34px;width:44px;border:0;background:transparent;border-radius:5px;font-size:13px;color:#7A8291}
+.ut button.on{background:#fff;color:#2B3448;font-weight:700;box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.mt{font-size:13px}
+.ap{margin-top:8px;font-size:14px}.ap b{color:#E5283E;font-weight:800}.ap .nx{color:#666;font-size:13px}
+.err{margin-top:8px;font-size:12.5px;color:#D11}
+.dt2{width:100%;display:flex;align-items:center;gap:8px;color:#2B3448}.dt2.ph{color:#9AA0AB}.dt2 .x{margin-left:auto;color:#999}
+.fsec .dg{margin-left:16px;margin-top:0}
+.fbtns{display:flex;justify-content:flex-end;gap:6px;border-top:1px solid #E6E8EC;padding-top:16px}
+.fbtns .pb{height:44px;padding:0 28px}
+.demo select{color:#1F2430;background:#fff}
+.dbox .dg{margin-left:0}
+.cal{width:15px;height:15px;flex:none;margin-right:6px}
+.dbox .dg{margin-top:14px}
