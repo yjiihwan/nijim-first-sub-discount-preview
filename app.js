@@ -167,10 +167,10 @@
     const pr = price();
     if (!force && pr.applied === "first") {
       const reg = pr.general ? pr.general.amount : pr.list;
-      const changed = (title, body) => modal(`<h5>${title}</h5><p>${body}<br>결제는 아직 되지 않았어요.</p>
+      const changed = (title, body) => modal(`<h5>${title}</h5><p>${body}<br>아직 결제된 금액은 없어요.</p>
           <div class="cmpp"><span><s>첫 달 ${won(pr.first)}원</s></span><span>→ 첫 달 <b>${won(reg)}원</b></span></div>
           <div class="acts"><button class="btn" data-x="1">취소</button><button class="btn pri" data-payreg="1">${won(reg)}원으로 결제</button></div>`);
-      if (ui.sim === "lost") return changed("가격이 바뀌었어요", `방금 이 센터에서 다른 결제(또는 이용) 기록이 확인돼서 <b class="nw">첫 구독 할인 대상이 아니게</b> 됐어요.`);
+      if (ui.sim === "lost") return changed("가격이 바뀌었어요", `방금 이 센터 이용 이력이 확인돼서 <b class="nw">첫 구독 할인 대상이 아니게</b> 됐어요.`);
       if (ui.sim === "soldout") return changed("선착순이 마감됐어요", `결제하는 사이에 다른 분들이 먼저 결제를 마쳐서 <b class="nw">첫 구독 할인 자리가 다 찼어요.</b>`);
       if (ui.sim === "end") return changed("할인이 끝났어요", `결제 승인 직전에 <b class="nw">첫 구독 할인 이벤트가 끝나서</b> 할인을 적용할 수 없어요.`);
       if (ui.sim === "fail") {
