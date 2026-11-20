@@ -63,7 +63,7 @@
   function subCard(pr) {
     const o = S.SUB_OPTION, d = pr.display, end = d.event ? d.event.end : null, rem = E.showRemain(d.event);
     if (d.kind === "first") {
-      return card({ head: o.label, sub: o.usage, lp: pr.list, mid: end != null ? "첫 구독 할인가" : null, big: `첫 달 ${won(d.amount)}원`, nx: `다음 달부터 월 ${won(d.recurring)}원`, end, badge: "first", buy: 1, rem });
+      return card({ head: o.label, sub: o.usage, lp: pr.list, big: `첫 달 ${won(d.amount)}원`, nx: `다음 달부터 월 ${won(d.recurring)}원`, end, badge: "first", buy: 1, rem });
     }
     if (d.kind === "general") return card({ head: o.label, sub: o.usage, lp: pr.list, big: `월 ${won(d.amount)}원`, end, buy: 1, rem });
     return card({ head: o.label, sub: o.usage, big: `월 ${won(pr.list)}원`, buy: 1 });
