@@ -22,22 +22,25 @@
      - 결제 이력: 모든 상품, 환불·해지·취소 포함 → 비대상
      - 이용 이력: 출입·수업·증정·센터 직접등록 포함 → 비대상
      - 무료 체험권 발급·이용 기록만 있으면: includeTrialUsers 옵션이 켜져 있을 때만 대상
-     - 이미 이 센터에서 첫 구독 할인을 받은 적(claim used) 있거나 진행 중(held, 다른 결제) → 비대상 */
+     - 이미 이 센터에서 첫 구독 할인을 받은 적(claim used) 있으면 → 비대상
+     - «결제 완료(승인 성공)»만 이력이다. 승인 실패·승인 전 이탈(failed/aborted)은 이력이 아니다 → 몇 번 실패해도, 시간이 지나도 계속 신규
+       (승인 뒤 환불·해지는 결제 완료가 있었으므로 이력) */
+  const NOT_COMPLETED = ["failed", "aborted"];
+  const completed = (p) => !NOT_COMPLETED.includes(p.status);
   function judge(history, opts) {
     if (!history) return { state: "unknown", reason: "로그인 전" };
     const h = history;
     if ((h.claims || []).some((c) => c.status === "used")) return { state: "ineligible", reason: "이미 첫 구독 할인을 받음" };
-    if ((h.claims || []).some((c) => c.status === "held" && c.quoteId !== (opts && opts.quoteId))) return { state: "ineligible", reason: "다른 결제가 진행 중" };
-    const paid = (h.payments || []).filter((p) => p.kind !== "trial");
+    const paid = (h.payments || []).filter((p) => p.kind !== "trial" && completed(p));
     if (paid.length) return { state: "ineligible", reason: "이 센터 결제 이력 있음" };
     const used = (h.usages || []).filter((u) => !u.viaTrial);
     if (used.length) return { state: "ineligible", reason: "이 센터 이용 이력 있음" };
-    const trial = (h.payments || []).some((p) => p.kind === "trial") || (h.usages || []).some((u) => u.viaTrial);
+    const trial = (h.payments || []).some((p) => p.kind === "trial" && completed(p)) || (h.usages || []).some((u) => u.viaTrial);
     if (trial && !(opts && opts.includeTrialUsers)) return { state: "ineligible", reason: "무료 체험권 이용 회원(대상 제외 설정)" };
     return { state: "eligible", reason: trial ? "무료 체험권만 이용(대상 포함 설정)" : "이 센터 이력 없음" };
   }
 
-  function activeAt(ev, now) { return ev.status !== "ended" && ev.start <= now && (ev.end == null || now <= ev.end) && (ev.limit == null || (ev.sold || 0) + (ev.held || 0) < ev.limit); }
+  function activeAt(ev, now) { return ev.status !== "ended" && ev.start <= now && (ev.end == null || now <= ev.end) && (ev.limit == null || (ev.sold || 0) < ev.limit); }
 
   /* 한 구독 상품 옵션의 회원별 가격.
      - 일반 할인(target=all)과 신규 첫 구독(target=first_sub)은 더하지 않는다. 1회차 결제금액이 더 싼 쪽 하나. 같으면 일반 할인(1회 한정 자격을 아껴 둠).
@@ -72,27 +75,22 @@
     return show(out.applied);
   }
 
-  // 견적(결제진행 화면에서 발급, 서버 저장) — 결제 승인 때 이 값으로만 청구한다
-  const QUOTE_TTL_MIN = 15;
-  function makeQuote(p, { now, optionId, memberId }) {
-    return { id: "q_" + Math.random().toString(36).slice(2, 9), memberId, optionId, applied: p.applied,
-      eventId: p.applied === "first" ? p.firstEvent.event.id : p.applied === "general" ? p.general.event.id : null,
-      listPrice: p.list, firstAmount: p.first, recurringAmount: p.recurring, issuedAt: now, expiresAt: addMin(now, QUOTE_TTL_MIN) };
-  }
-  function addMin(iso, m) { const d = new Date(iso.replace(" ", "T") + ":00+09:00"); d.setMinutes(d.getMinutes() + m); return fmt(d); }
-  function fmt(d) { const k = new Date(d.getTime() + 9 * 3600e3).toISOString(); return k.slice(0, 10) + " " + k.slice(11, 16); }
-
-  /* 결제 승인 직전 재검사. 결과: ok(견적대로 청구) | changed(새 가격 다시 확인받기 — 몰래 비싸게 청구 금지) */
-  function revalidate(quote, ctx) {
-    if (ctx.now > quote.expiresAt) return { result: "changed", why: "견적 유효시간(15분) 지남" };
-    if (quote.applied !== "first") return { result: "ok" };
-    const ev = ctx.events.find((e) => e.id === quote.eventId);
-    if (!ev) return { result: "changed", why: "이벤트 삭제" };
-    // 이벤트 종료 경계: 종료 전에 받은 견적은 유효시간 안이면 인정(선착순 자리도 견적 때 잡아 둠)
-    if (ev.end != null && quote.issuedAt > ev.end) return { result: "changed", why: "이벤트 종료 후 견적" };
-    const j = judge(ctx.history, { includeTrialUsers: ev.includeTrialUsers, quoteId: quote.id });
-    if (j.state !== "eligible") return { result: "changed", why: j.reason };
-    return { result: "ok" };
+  /* 결제 승인 시점 재판정 — 화면에 보여 준 가격(shown)과 «지금» 다시 계산한 가격을 비교한다.
+     결제창에 들어온 시각·머문 시간은 보지 않는다(결제창 가격 묶기·자리 잡아두기 없음). 이벤트 종료·선착순·관리자 할인액 수정·자격은 전부 승인 시점 값.
+     ctx = priceFor 인자 + inFlight(같은 이벤트로 지금 PG 응답을 기다리는 다른 승인 건수 — 초 단위, 마지막 자리 동시 승인 방지)
+     결과: ok(보여 준 가격으로 청구) | changed(새 가격으로 다시 확인받기 — 몰래 비싸게 청구 금지, PG 호출 전 반환) */
+  function approveCheck(shown, ctx) {
+    const evs = (ctx.events || []).map((e) => e.id === shown.eventId && e.limit != null ? Object.assign({}, e, { sold: (e.sold || 0) + (ctx.inFlight || 0) }) : e);
+    const p = priceFor(Object.assign({}, ctx, { events: evs }));
+    if (p.applied === shown.applied && p.first === shown.firstAmount) return { result: "ok", price: p };
+    let why = "amount_changed";
+    if (shown.applied === "first" && p.applied !== "first") {
+      const ev = (ctx.events || []).find((e) => e.id === shown.eventId);
+      const j = judge(ctx.history, { includeTrialUsers: ev && ev.includeTrialUsers });
+      why = !ev || ev.status === "ended" ? "ended" : ev.end != null && ctx.now > ev.end ? "ended"
+        : ev.limit != null && (ev.sold || 0) + (ctx.inFlight || 0) >= ev.limit ? "soldout" : j.state !== "eligible" ? "ineligible" : "amount_changed";
+    }
+    return { result: "changed", why, price: p };
   }
 
   // 구독 회차별 청구 금액
@@ -107,13 +105,13 @@
     const p = (n) => String(n).padStart(2, "0");
     return `${d ? d + "일 " : ""}${p(Math.floor(s / 3600))}:${p(Math.floor((s % 3600) / 60))}:${p(s % 60)} 남음`;
   }
-  /* 선착순 «N장 남음» 표시(v1.3). 남은 장수 = 선착순 수량 − 판매 − 잡아 둔 자리(held).
+  /* 선착순 «N장 남음» 표시(v1.3). 남은 장수 = 선착순 수량 − 결제 완료 건수(sold). 결제창 진입·승인 실패는 빼지 않는다.
      선착순 미설정(limit=null) → 표시 안 함. 1~10장 → 표시(카드 위 «⏰ N장 남음» + 딱지 «마감 임박»). 11장 이상 → 표시 안 함.
      0장 = 매진 → activeAt()이 이벤트를 빼서 카드가 정가/일반가로 돌아감(기존 규칙, 새 화면 없음). */
   const REMAIN_SHOW_MAX = 10;
-  function remainOf(ev) { if (!ev || ev.limit == null) return null; return Math.max(0, ev.limit - (ev.sold || 0) - (ev.held || 0)); }
+  function remainOf(ev) { if (!ev || ev.limit == null) return null; return Math.max(0, ev.limit - (ev.sold || 0)); }
   function showRemain(ev) { const r = remainOf(ev); return r != null && r >= 1 && r <= REMAIN_SHOW_MAX ? r : null; }
   const won = (n) => Math.round(n).toLocaleString("ko-KR");
-  const api = { MIN_FIRST_AMOUNT, QUOTE_TTL_MIN, discountOf, validateDiscount, judge, priceFor, makeQuote, revalidate, chargeFor, addMin, won, activeAt, remainLabel, REMAIN_SHOW_MAX, remainOf, showRemain };
+  const api = { MIN_FIRST_AMOUNT, discountOf, validateDiscount, judge, priceFor, approveCheck, chargeFor, won, activeAt, remainLabel, REMAIN_SHOW_MAX, remainOf, showRemain };
   if (typeof module !== "undefined") module.exports = api; else root.FSE = api;
 })(typeof window !== "undefined" ? window : globalThis);

@@ -18,6 +18,7 @@
     noEnd: qs.get("end") === "0",
     noFs: qs.get("fs") === "0",
     sim: qs.get("sim") || "ok",
+    loginAs: qs.get("as") || "new", // 시안 조작판 «로그인하면 이 회원»: 실서비스엔 고르는 단계 없음(서버가 결제 이력으로 판별)
     rem: qs.has("rem") ? Number(qs.get("rem")) : null, // 조작판 «선착순 남은 장수»(시안용): 이 센터 할인이벤트 전부에 적용
 
     af: { method: "all", target: qs.get("tf") || "all", status: "all", limit: "all" },
@@ -35,7 +36,7 @@
     return base;
   }
   // 조작판 «할인 종료일 없음»: 회원 화면에서 종료일 없는 할인(→ 이벤트 할인가 카드)으로 바꿔 봄
-  function shopEvents() { return events().filter((e) => e.center === ui.center && !(ui.noFs && e.target === "first_sub")).map((e) => Object.assign({}, e, ui.noEnd ? { end: null } : {}, ui.rem != null && e.method === "price" ? { limit: (e.sold || 0) + ui.rem, held: 0 } : {})); }
+  function shopEvents() { return events().filter((e) => e.center === ui.center && !(ui.noFs && e.target === "first_sub")).map((e) => Object.assign({}, e, ui.noEnd ? { end: null } : {}, ui.rem != null && e.method === "price" ? { limit: (e.sold || 0) + ui.rem } : {})); }
   function price() {
     return E.priceFor({ option: S.SUB_OPTION, events: shopEvents(), history: history(), now: S.NOW, generalRenews: ui.renew });
   }
@@ -161,26 +162,26 @@
       <button class="rx-btn" data-pay="1">결제하기</button></div></div>`;
   }
 
-  // 결제 버튼: 서버 재검사 흉내(조작판 «결제 순간 상황»)
+  // 결제 버튼: 승인 시점 서버 재판정 흉내(조작판 «결제 승인 순간»). 결제창 진입 시각·체류 시간은 보지 않는다
   function doPay(force) {
     const pr = price();
-    const q = E.makeQuote(pr, { now: S.NOW, optionId: S.SUB_OPTION.id, memberId: ui.who });
     if (!force && pr.applied === "first") {
-      if (ui.sim === "lost") {
-        const reg = pr.general ? pr.general.amount : pr.list;
-        return modal(`<h5>가격이 바뀌었어요</h5><p>결제하는 사이에 이 센터 이용 기록이 생겨서 <b>신규 첫 구독 할인 대상이 아니게</b> 됐어요.<br>결제는 아직 되지 않았어요.</p>
+      const reg = pr.general ? pr.general.amount : pr.list;
+      const changed = (title, body) => modal(`<h5>${title}</h5><p>${body}<br>결제는 아직 되지 않았어요.</p>
           <div class="cmpp"><span><s>첫 달 ${won(pr.first)}원</s></span><span>→ 첫 달 <b>${won(reg)}원</b></span></div>
           <div class="acts"><button class="btn" data-x="1">취소</button><button class="btn pri" data-payreg="1">${won(reg)}원으로 결제</button></div>`);
-      }
+      if (ui.sim === "lost") return changed("가격이 바뀌었어요", `방금 이 센터에서 다른 결제(또는 이용) 기록이 확인돼서 <b class="nw">첫 구독 할인 대상이 아니게</b> 됐어요.`);
+      if (ui.sim === "soldout") return changed("선착순이 마감됐어요", `결제하는 사이에 다른 분들이 먼저 결제를 마쳐서 <b class="nw">첫 구독 할인 자리가 다 찼어요.</b>`);
+      if (ui.sim === "end") return changed("할인이 끝났어요", `결제 승인 직전에 <b class="nw">첫 구독 할인 이벤트가 끝나서</b> 할인을 적용할 수 없어요.`);
       if (ui.sim === "fail") {
         ui.sim = "ok"; syncDemo();
-        return modal(`<h5>카드 승인이 안 됐어요</h5><p>한도·잔액을 확인하고 다시 시도해 주세요.<br><b>첫 달 ${won(pr.first)}원 할인은 그대로 유지돼요.</b> (15분 안에 다시 결제하면 같은 가격)</p>
+        return modal(`<h5>카드 승인이 안 됐어요</h5><p>한도·잔액을 확인하고 다시 시도해 주세요.<br><b>결제가 완료되기 전까지 <span class="nw">첫 달 ${won(pr.first)}원 할인은 그대로예요.</span></b></p>
           <div class="acts"><button class="btn" data-x="1">닫기</button><button class="btn pri" data-retry="1">다시 결제하기</button></div>`);
       }
     }
-    finish(pr, force === "reg" ? "reg" : null, q);
+    finish(pr, force === "reg" ? "reg" : null);
   }
-  function finish(pr, mode, q) {
+  function finish(pr, mode) {
     const reg = mode === "reg";
     const first = !reg && pr.applied === "first";
     const amount = reg ? (pr.general ? pr.general.amount : pr.list) : pr.first;
@@ -190,19 +191,17 @@
     const h = (st.extraHist[p.id][ui.center] = st.extraHist[p.id][ui.center] || {});
     (h.payments = h.payments || []).push({ kind: "sub", title: "헬스 구독 멤버십 1회차", status: "paid", at: S.NOW.slice(0, 10) });
     if (first) {
-      (h.claims = h.claims || []).push({ status: "used", at: S.NOW.slice(0, 10), quoteId: q.id });
+      (h.claims = h.claims || []).push({ status: "used", at: S.NOW.slice(0, 10) });
       const ev = st.events.find((e) => e.id === pr.firstEvent.event.id);
       if (ev) { ev.sold++; ev.stats = ev.stats || { pay: 0, rev: 0, second: 0, secondRev: 0 }; ev.stats.pay++; ev.stats.rev += amount; }
     }
     save(); modal("");
-    ui.done = { first, amount, recurring, list: pr.list, sim: ui.sim };
+    ui.done = { first, amount, recurring, list: pr.list };
     ui.view = "done"; render(); scrollTo(0, 0);
   }
   function doneView() {
     const d = ui.done;
     if (!d) return `<div class="phone"><div class="ph-top">결제 완료</div><div class="done"><p class="sub">센터 상세에서 결제를 먼저 해 주세요</p><button class="paybtn" data-go="center">센터 상세로</button></div></div>`;
-    const edge = d.sim === "end" ? `<p class="fs-edge">이벤트 종료(23:59) 직전에 결제 화면에 들어왔다면, 15분 안에 결제하면 할인이 그대로 적용돼요.</p>`
-      : d.sim === "soldout" ? `<p class="fs-edge">결제 화면에 들어올 때 선착순 자리를 15분간 잡아 둬서, 그사이 마감돼도 할인이 유지돼요.</p>` : "";
     return `<div class="phone"><div class="ph-top">결제 완료</div><div class="done">
       <div class="ok">✓</div><h5>결제가 완료됐어요</h5><p class="sub">헬스 구독 멤버십 · ${d.first ? "첫 달 " : ""}${won(d.amount)}원</p>
       <div class="fs-done">
@@ -211,7 +210,6 @@
         ${d.first ? "" : `<div class="r"><span class="k">다음 결제</span><span class="v">${NEXT}부터 매월 <b>${won(d.recurring)}원</b> 자동결제</span></div>`}
       </div>
       ${d.first ? `<div class="fs-plan sm"><div class="h">첫 달 <b>${won(d.amount)}원</b>, 다음 달부터 매월 <b>${won(d.recurring)}원</b> 자동결제</div><p>다음 결제일 ${NEXT} · 구독은 언제든 해지할 수 있어요<br>해지 후 다시 가입하면 정상가로 결제돼요</p></div>` : ""}
-      ${edge}
       <button class="paybtn" data-go="center">확인</button></div></div>`;
   }
 
@@ -320,18 +318,19 @@
     const admin = ui.view === "list" || ui.view === "form";
     const pr = price();
     const jl = pr.judge ? ({ eligible: "✅ 대상", ineligible: "⛔ 비대상", unknown: "❔ 판정 전(로그인 필요)" }[pr.judge.state] + ` · ${pr.judge.reason}`) : "이 센터 신규 할인 없음";
-    return `<div class="demo-h">신규 첫 구독 할인 시안 v1.3 <span>(실제 서비스 아님 · 더미 데이터 · 지금=${S.NOW})</span></div>
+    return `<div class="demo-h">신규 첫 구독 할인 시안 v1.4 <span>(실제 서비스 아님 · 더미 데이터 · 지금=${S.NOW})</span></div>
       <nav class="demo-nav">${VIEWS.map(([v, l]) => `<a data-v="${v}" class="${ui.view === v ? "on" : ""}">${l}</a>`).join("")}</nav>
       <div class="demo-opt">
         ${admin ? `<label>관리자 계정 <select id="o-admin">${Object.values(S.CENTERS).map((c) => `<option value="${c.id}" ${c.id === ui.center ? "selected" : ""}>${c.name} 관리자</option>`).join("")}</select></label>`
           : `<label>회원 <select id="o-who">${S.PERSONAS.map((p) => `<option value="${p.id}" ${p.id === ui.who ? "selected" : ""}>${p.label}</option>`).join("")}</select></label>
              <label>센터 <select id="o-center">${Object.values(S.CENTERS).map((c) => `<option value="${c.id}" ${c.id === ui.center ? "selected" : ""}>${c.name}</option>`).join("")}</select></label>
+             ${persona().hist === null ? `<label>로그인하면 <select id="o-as">${S.PERSONAS.filter((p) => p.hist !== null).map((p) => `<option value="${p.id}" ${p.id === ui.loginAs ? "selected" : ""}>${p.label}</option>`).join("")}</select></label>` : ""}
              <span class="jd">${esc(jl)}</span>`}
         <label><input type="checkbox" id="o-ov" ${ui.overlap ? "checked" : ""}> 일반 할인 같이 진행(월 43,800원)</label>
         ${admin ? "" : `<label><input type="checkbox" id="o-fs" ${ui.noFs ? "checked" : ""}> 첫 구독 할인 끔</label>`}
         ${admin ? "" : `<label><input type="checkbox" id="o-end" ${ui.noEnd ? "checked" : ""}> 할인 종료일 없음(이벤트 할인가 카드)</label>`}
         ${admin ? "" : `<label>선착순 남은 장수 <select id="o-rem">${[["", "그대로(표시 안 됨)"], ["11", "11장(표시 안 함)"], ["10", "10장(표시)"], ["3", "3장"], ["1", "1장"], ["0", "0장(매진)"]].map(([v, l]) => `<option value="${v}" ${String(ui.rem ?? "") === v ? "selected" : ""}>${l}</option>`).join("")}</select></label>`}
-        ${ui.view === "pay" ? `<label>결제 순간 <select id="o-sim">${[["ok", "정상"], ["lost", "도중에 자격 잃음"], ["end", "이벤트 종료 직전"], ["soldout", "선착순 마감 직전"], ["fail", "첫 결제 카드 실패"]].map(([v, l]) => `<option value="${v}" ${ui.sim === v ? "selected" : ""}>${l}</option>`).join("")}</select></label>` : ""}
+        ${ui.view === "pay" ? `<label>결제 승인 순간 <select id="o-sim">${[["ok", "정상"], ["lost", "다른 기기에서 먼저 결제 완료"], ["end", "승인 직전 이벤트 종료"], ["soldout", "승인 직전 선착순 마감"], ["fail", "첫 결제 카드 실패"]].map(([v, l]) => `<option value="${v}" ${ui.sim === v ? "selected" : ""}>${l}</option>`).join("")}</select></label>` : ""}
         <button id="o-reset">처음 상태로</button>
       </div>`;
   }
@@ -351,12 +350,12 @@
     if (t.dataset.v) return go(t.dataset.v);
     if (t.dataset.go) return go(t.dataset.go);
     if (t.dataset.buy || t.dataset.login) {
-      if (persona().hist === null) return modal(`<h5>로그인이 필요해요</h5><p>로그인하면 이 센터 <b>신규 첫 구독 할인</b> 대상인지 바로 확인해 드려요.<br><span class="g">(시안: 어떤 회원으로 로그인할지 고르세요)</span></p>
-        <div class="acts col"><button class="btn pri" data-as="new">신규 회원으로 로그인</button><button class="btn" data-as="paid">독산점 결제 이력 있는 회원으로 로그인</button><button class="btn" data-x="1">닫기</button></div>`);
+      if (persona().hist === null) return modal(`<h5>로그인이 필요해요</h5><p>로그인하면 이 센터 <b>신규 첫 구독 할인</b> 대상인지 바로 확인해 드려요.</p>
+        <div class="acts col"><button class="btn pri" data-as="1">로그인</button><button class="btn" data-x="1">닫기</button></div>`);
       return go("pay");
     }
     if (t.dataset.as) {
-      ui.who = t.dataset.as; modal(""); render();
+      ui.who = ui.loginAs; modal(""); render();
       const pr = price();
       if (pr.applied === "first") toast(`첫 구독 할인 대상이에요 · 첫 달 ${won(pr.first)}원`);
       else if (notTarget(pr)) toast(`첫 구독 할인 대상이 아니에요 · 회원님 가격 월 ${won(pr.general ? pr.general.amount : pr.list)}원`);
@@ -379,6 +378,7 @@
     if (t.id === "o-fs") { ui.noFs = t.checked; return render(); }
     if (t.id === "o-end") { ui.noEnd = t.checked; return render(); }
     if (t.id === "o-sim") { ui.sim = t.value; return; }
+    if (t.id === "o-as") { ui.loginAs = t.value; return; }
     if (t.id === "o-rem") { ui.rem = t.value === "" ? null : Number(t.value); return render(); }
     if (!ui.form) return;
     if (t.dataset.cat !== undefined) { ui.form.cat = t.value; ui.form.opts = []; ui.form.target = "all"; return render(); }
